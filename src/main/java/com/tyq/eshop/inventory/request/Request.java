@@ -10,4 +10,7 @@ public interface Request {
 
     Long getProductId();
 
+    boolean isForceRefresh();
+
+
 }

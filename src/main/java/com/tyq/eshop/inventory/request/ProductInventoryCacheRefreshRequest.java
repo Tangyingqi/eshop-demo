@@ -11,10 +11,12 @@ public class ProductInventoryCacheRefreshRequest implements Request {
 
     private Long productId;
     private ProductInventoryService productInventoryService;
+    private boolean isForceRefresh;
 
-    public ProductInventoryCacheRefreshRequest(Long productId, ProductInventoryService productInventoryService) {
+    public ProductInventoryCacheRefreshRequest(Long productId, ProductInventoryService productInventoryService,boolean isForceRefresh) {
         this.productId = productId;
         this.productInventoryService = productInventoryService;
+        this.isForceRefresh = isForceRefresh;
     }
 
     @Override
@@ -30,5 +32,10 @@ public class ProductInventoryCacheRefreshRequest implements Request {
     @Override
     public Long getProductId() {
         return productId;
+    }
+
+    @Override
+    public boolean isForceRefresh() {
+        return isForceRefresh;
     }
 }

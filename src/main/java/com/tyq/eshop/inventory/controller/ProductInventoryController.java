@@ -25,9 +25,9 @@ public class ProductInventoryController {
     private RequestAsynProcessService requestAsynProcessService;
 
     @PutMapping("/update-product-inventory")
-    public Response updateProductInventory(@RequestBody ProductInventory productInventory){
+    public Response updateProductInventory(@RequestBody ProductInventory productInventory) {
 
-        Request updateRequest = new ProductInventoryDBUpdateRequest(productInventory,productInventoryService);
+        Request updateRequest = new ProductInventoryDBUpdateRequest(productInventory, productInventoryService);
         try {
             requestAsynProcessService.process(updateRequest);
             return new Response(Response.SUCCESS);
@@ -38,9 +38,9 @@ public class ProductInventoryController {
     }
 
     @GetMapping("/query-product-inventory")
-    public ProductInventory queryProductInventory(@RequestParam("productId") Long productId){
+    public ProductInventory queryProductInventory(@RequestParam("productId") Long productId) {
 
-        ProductInventoryCacheRefreshRequest refreshRequest = new ProductInventoryCacheRefreshRequest(productId,productInventoryService);
+        ProductInventoryCacheRefreshRequest refreshRequest = new ProductInventoryCacheRefreshRequest(productId, productInventoryService, false);
         try {
             requestAsynProcessService.process(refreshRequest);
 
@@ -48,28 +48,35 @@ public class ProductInventoryController {
             long endTime = 0L;
             long waitTime = 0L;
             ProductInventory productInventory;
-            while (true){
+            while (true) {
 
-                if (waitTime > 200){
+                if (waitTime > 200) {
                     break;
                 }
-                 productInventory = productInventoryService.queryProductInventoryFromCache(productId);
-                if (productInventory != null){
+                productInventory = productInventoryService.queryProductInventoryFromCache(productId);
+                if (productInventory != null) {
                     return productInventory;
-                }else{
+                } else {
                     Thread.sleep(20);
                     endTime = System.currentTimeMillis();
                     waitTime = endTime - startTime;
                 }
             }
 
-            return productInventoryService.queryProductInventory(productId);
+            productInventory = productInventoryService.queryProductInventory(productId);
+            if (productInventory != null) {
+                // 这里要构建一个查询请求，强制刷新一下缓存
+                // 避免出现这种情况：缓存因为某些情况被清掉了，但是在过滤查询请求那边，标志位还是 false , 导致缓存一直得不到刷新，所以强制刷新一下
+                refreshRequest = new ProductInventoryCacheRefreshRequest(productId, productInventoryService, true);
+                requestAsynProcessService.process(refreshRequest);
+                return productInventory;
+            }
 
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        return new ProductInventory(productId,-1L);
+        return new ProductInventory(productId, -1L);
     }
 
 }

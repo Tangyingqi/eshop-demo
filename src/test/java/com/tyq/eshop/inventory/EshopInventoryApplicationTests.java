@@ -19,11 +19,4 @@ public class EshopInventoryApplicationTests {
     public void contextLoads() {
     }
 
-    @Test
-    public void getValue(){
-        ValueOperations<String,String> operations=redisTemplate.opsForValue();
-        System.out.println(operations.get("kkk"));
-    }
-
-
 }

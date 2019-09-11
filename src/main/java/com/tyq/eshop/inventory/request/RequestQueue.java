@@ -1,8 +1,11 @@
 package com.tyq.eshop.inventory.request;
 
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 请求内存队列
@@ -12,6 +15,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class RequestQueue {
 
     private List<ArrayBlockingQueue<Request>> queues = new ArrayList<>();
+    private Map<Long,Boolean> flagMap = new ConcurrentHashMap<>();
 
     public int queueSize() {
         return queues.size();
@@ -41,5 +45,9 @@ public class RequestQueue {
      */
     public void addQueue(ArrayBlockingQueue<Request> queue){
         this.queues.add(queue);
+    }
+
+    public Map<Long, Boolean> getFlagMap() {
+        return flagMap;
     }
 }

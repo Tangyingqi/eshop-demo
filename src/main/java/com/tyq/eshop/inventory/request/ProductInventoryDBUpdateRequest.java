@@ -25,8 +25,10 @@ public class ProductInventoryDBUpdateRequest implements Request {
     @Override
     public void process() {
 
+
         // 删除 Redis 中的缓存
         productInventoryService.deleteProductInventoryFromCache(productInventory);
+
         // 修改数据库中的数据
         productInventoryService.updateProductInventory(productInventory);
 
@@ -35,6 +37,11 @@ public class ProductInventoryDBUpdateRequest implements Request {
     @Override
     public Long getProductId() {
         return productInventory.getProductId();
+    }
+
+    @Override
+    public boolean isForceRefresh() {
+        return false;
     }
 
 
